@@ -2,6 +2,11 @@
   border: 3px solid gray;
   width: 60px;
   height: 60px;
+  font-weight: bold;
+  font-size: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .row {
@@ -21,19 +26,19 @@
 }
 
 .grey {
-  background-color: #808080;
+  background-color: #808384;
 }
 .yellow {
-  background-color: #FFFF00;
+  background-color: #b5a13c;
 }
 .green {
-  background-color: #00FF00;
+  background-color: #528c4d;
 }
 
 .key {
   height: 60px;
   width: 50px;
-  background-color: green;
+  background-color: #808384;
   display: flex;
   justify-content: center;
   align-items: center;

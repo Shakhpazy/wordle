@@ -1,11 +1,119 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 
 function App() {
+
+  const [word, setWord] = useState('plays')
+  const [guess, setGuess] = useState('')
+  const [guesses, setGuesses] = useState([])
+  const [attempts, setAttempts] = useState(0)
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      const key = event.key.toLowerCase()
+      if (key === 'enter') {
+        if (guess.length === 5) {
+          setGuesses((prevGuesses) => [...prevGuesses, guess]);
+          setAttempts(attempts + 1)
+          setGuess('')
+        }
+      } else if (key === 'backspace') {
+        setGuess(guess.slice(0, -1))
+      } else if (/^[a-z]$/.test(key)) {
+        if (guess.length < 5) {
+          setGuess(guess + key)
+        }
+      }
+    }
+
+    console.log('guess', guess)
+    console.log('attempts', attempts)
+    console.log('word', word)
+    console.log('guesses', guesses)
+
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [guess, attempts, word, guesses])
+
+  function RowGenerator() {
+    const rows = [];
   
+    // 1. Add past guesses
+    for (let i = 0; i < guesses.length; i++) {
+      const boxes = [];
+      for (let j = 0; j < 5; j++) {
+        const letter = guesses[i][j] || '';
+        if (word.includes(letter) && word[j] == letter) {
+          boxes.push(
+            <div className='box green' key={j}>
+              {letter}
+            </div>
+          );
+        } else if (word.includes(letter)) {
+          boxes.push(
+            <div className='box yellow' key={j}>
+              {letter}
+            </div>
+          );
+        } else {
+          boxes.push(
+            <div className='box' key={j}>
+              {letter}
+            </div>
+          );
+        }
+      }
+      rows.push(
+        <div className='row' key={`guess-${i}`}>
+          {boxes}
+        </div>
+      );
+    }
+  
+    // 2. Add current guess (in progress)
+    if (guesses.length < 6) {
+      const boxes = [];
+      for (let j = 0; j < 5; j++) {
+        const letter = guess[j] || '';
+        boxes.push(
+          <div className='box' key={j}>
+            {letter}
+          </div>
+        );
+      }
+      rows.push(
+        <div className='row' key={`current`}>
+          {boxes}
+        </div>
+      );
+    }
+  
+    // 3. Add empty rows to fill up to 6
+    for (let i = guesses.length + 1; i < 6; i++) {
+      const boxes = [];
+      for (let j = 0; j < 5; j++) {
+        boxes.push(
+          <div className='box' key={j}></div>
+        );
+      }
+      rows.push(
+        <div className='row' key={`empty-${i}`}>
+          {boxes}
+        </div>
+      );
+    }
+  
+    return rows;
+  }
+  
+  
+
+
   const keyboard = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -15,55 +123,14 @@ function App() {
   return (
     <>
       <div className="wrapper">
-      <div className='row'>
-        <div className='box green'></div>
-        <div className='box yellow'></div>
-        <div className='box grey'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
-      <div className='row'>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
-      <div className='row'>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
-      <div className='row'>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
-      <div className='row'>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
-      <div className='row'>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-        <div className='box'></div>
-      </div>
+        <RowGenerator />
       </div>
 
       <div className='keyboard'>
         {keyboard.map((row, rowIndex) => (
           <div className='row' key={rowIndex}>
             {row.map((key, keyIndex) => (
-              <div className='key' key={keyIndex}>
+              <button className='key' key={keyIndex} type='button'>
                 {key === 'Enter' ? (
                   <div className='key-enter'>Enter</div>
                 ) : key === 'Backspace' ? (
@@ -71,7 +138,7 @@ function App() {
                 ) : (
                   <div className='key-letter'>{key}</div>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         ))}
