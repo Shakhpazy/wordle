@@ -1,5 +1,5 @@
 .box {
-  background-color: white;
+  border: 3px solid gray;
   width: 60px;
   height: 60px;
 }
@@ -17,5 +17,40 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 90vh;
+  height: 60vh;
+}
+
+.grey {
+  background-color: #808080;
+}
+.yellow {
+  background-color: #FFFF00;
+}
+.green {
+  background-color: #00FF00;
+}
+
+.key {
+  height: 60px;
+  width: 50px;
+  background-color: green;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.key-letter {
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+}
+
+.key-enter, .key-backspace {
+  font-weight: bold;
+}
+
+.key:has(.key-enter),
+.key:has(.key-backspace) {
+  width: 80px; /* make special keys wider */
 }
