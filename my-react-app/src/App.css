@@ -22,7 +22,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 60vh;
+  height: 70vh;
 }
 
 .grey {
@@ -33,6 +33,10 @@
 }
 .green {
   background-color: #528c4d;
+}
+
+.keyboard {
+  margin-top: 30px;
 }
 
 .key {
@@ -49,6 +53,10 @@
   color: white;
   font-weight: bold;
   font-size: 24px;
+}
+
+.key:hover {
+  border-color: #808384;
 }
 
 .key-enter, .key-backspace {

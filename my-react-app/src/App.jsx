@@ -8,35 +8,48 @@ function App() {
   const [guess, setGuess] = useState('')
   const [guesses, setGuesses] = useState([])
   const [attempts, setAttempts] = useState(0)
+  const [gameState, setGameState] = useState(true)
+
+  useEffect(() => {
+    console.log(guesses.length)
+    if (guesses.length >= 6) {
+      setGuess("")
+      setGameState(false)
+      setAttempts(0)
+    }
+  }, [guesses])
 
   useEffect(() => {
     const handleKeyPress = (event) => {
       const key = event.key.toLowerCase()
-      if (key === 'enter') {
-        if (guess.length === 5) {
-          setGuesses((prevGuesses) => [...prevGuesses, guess]);
-          setAttempts(attempts + 1)
-          setGuess('')
-        }
-      } else if (key === 'backspace') {
-        setGuess(guess.slice(0, -1))
-      } else if (/^[a-z]$/.test(key)) {
-        if (guess.length < 5) {
-          setGuess(guess + key)
-        }
-      }
+      keypressabstract(key)
     }
-
-    console.log('guess', guess)
-    console.log('attempts', attempts)
-    console.log('word', word)
-    console.log('guesses', guesses)
-
     document.addEventListener('keydown', handleKeyPress)
     return () => {
       document.removeEventListener('keydown', handleKeyPress)
     }
   }, [guess, attempts, word, guesses])
+
+  function keypressabstract(key) {
+    if (gameState === false) {
+      setGameState(true)
+      setGuesses([])
+    }
+    else if (key === 'enter') {
+      if (guess.length === 5) {
+        setGuesses((prevGuesses) => [...prevGuesses, guess]);
+        setAttempts(attempts + 1)
+        setGuess('')
+      }
+    } else if (key === 'backspace') {
+      setGuess(guess.slice(0, -1))
+    } else if (/^[a-z]$/.test(key)) {
+      if (guess.length < 5) {
+        setGuess(guess + key)
+      }
+    }
+
+  }
 
   function RowGenerator() {
     const rows = [];
@@ -121,14 +134,18 @@ function App() {
   return (
     <>
       <div className="wrapper">
-        <RowGenerator />
-      </div>
 
-      <div className='keyboard'>
+        <div>
+          {gameState ? <h1>Wordle</h1> : <h1>Press any key to Play again</h1>}
+        </div>
+
+        <RowGenerator />
+
+        <div className='keyboard'>
         {keyboard.map((row, rowIndex) => (
           <div className='row' key={rowIndex}>
             {row.map((key, keyIndex) => (
-              <button className='key' key={keyIndex} type='button'>
+              <button className='key' key={keyIndex} type='button' id={key} onClick={() => keypressabstract(key.toLowerCase())}>
                 {key === 'Enter' ? (
                   <div className='key-enter'>Enter</div>
                 ) : key === 'Backspace' ? (
@@ -140,6 +157,7 @@ function App() {
             ))}
           </div>
         ))}
+      </div>
       </div>
     </>
   )
