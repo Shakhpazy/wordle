@@ -22,7 +22,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 70vh;
+  height: 100vh;
 }
 
 .grey {
@@ -42,7 +42,6 @@
 .key {
   height: 60px;
   width: 50px;
-  background-color: #808384;
   display: flex;
   justify-content: center;
   align-items: center;

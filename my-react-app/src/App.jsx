@@ -1,17 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import './App.css'
 
 
 function App() {
+
+  const defaultKeyboardState = [
+    [{ q: undefined }, { w: undefined }, { e: undefined }, { r: undefined }, { t: undefined }, { y: undefined }, { u: undefined }, { i: undefined }, { o: undefined }, { p: undefined }],
+    [{ a: undefined }, { s: undefined }, { d: undefined }, { f: undefined }, { g: undefined }, { h: undefined }, { j: undefined }, { k: undefined }, { l: undefined }],
+    [{ Enter: undefined }, { z: undefined }, { x: undefined }, { c: undefined }, { v: undefined }, { b: undefined }, { n: undefined }, { m: undefined }, { Backspace: undefined }]
+  ]
 
   const [word, setWord] = useState('plays')
   const [guess, setGuess] = useState('')
   const [guesses, setGuesses] = useState([])
   const [attempts, setAttempts] = useState(0)
   const [gameState, setGameState] = useState(true)
+  const [keyboardState, setKeyboardState] = useState([
+    [{ q: undefined }, { w: undefined }, { e: undefined }, { r: undefined }, { t: undefined }, { y: undefined }, { u: undefined }, { i: undefined }, { o: undefined }, { p: undefined }],
+    [{ a: undefined }, { s: undefined }, { d: undefined }, { f: undefined }, { g: undefined }, { h: undefined }, { j: undefined }, { k: undefined }, { l: undefined }],
+    [{ Enter: undefined }, { z: undefined }, { x: undefined }, { c: undefined }, { v: undefined }, { b: undefined }, { n: undefined }, { m: undefined }, { Backspace: undefined }]
+  ]);
 
   useEffect(() => {
-    console.log(guesses.length)
     if (guesses.length >= 6) {
       setGuess("")
       setGameState(false)
@@ -31,14 +41,40 @@ function App() {
   }, [guess, attempts, word, guesses])
 
   function keypressabstract(key) {
+    key = key.toLowerCase()
     if (gameState === false) {
+      setKeyboardState(defaultKeyboardState)
       setGameState(true)
       setGuesses([])
     }
     else if (key === 'enter') {
+      if (guess.length < 5) return
       if (guess.length === 5) {
         setGuesses((prevGuesses) => [...prevGuesses, guess]);
-        setAttempts(attempts + 1)
+        setAttempts(attempts => attempts + 1)
+        for (const char of guess) {
+          setKeyboardState((prevState) => {
+            const newState = prevState.map(row =>
+              row.map((keyObj) => {
+                const keyName = Object.keys(keyObj)[0];
+                const keyStatus = keyObj[keyName];
+        
+                if (keyName === char) {
+                  if (word.includes(char)) {
+                    if (word.indexOf(char) === guess.indexOf(char)) {
+                      return { [keyName]: 'green' };
+                    } 
+                    return { [keyName]: 'yellow' };
+                  } 
+
+                  return { [keyName]: 'grey' };
+                }
+                return keyObj; // unchanged
+              })
+            );
+            return newState;
+          });
+        }
         setGuess('')
       }
     } else if (key === 'backspace') {
@@ -124,13 +160,6 @@ function App() {
   
   
 
-
-  const keyboard = [
-    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['Enter','z', 'x', 'c', 'v', 'b', 'n', 'm', 'Backspace'],
-  ];
-
   return (
     <>
       <div className="wrapper">
@@ -142,22 +171,33 @@ function App() {
         <RowGenerator />
 
         <div className='keyboard'>
-        {keyboard.map((row, rowIndex) => (
-          <div className='row' key={rowIndex}>
-            {row.map((key, keyIndex) => (
-              <button className='key' key={keyIndex} type='button' id={key} onClick={() => keypressabstract(key.toLowerCase())}>
-                {key === 'Enter' ? (
-                  <div className='key-enter'>Enter</div>
-                ) : key === 'Backspace' ? (
-                  <div className='key-backspace'>Delete</div>
-                ) : (
-                  <div className='key-letter'>{key}</div>
-                )}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+          {keyboardState.map((row, rowIndex) => (
+            <div className='row' key={rowIndex}>
+              {row.map((keyObj, keyIndex) => {
+                const keyName = Object.keys(keyObj)[0];
+                const keyStatus = keyObj[keyName];
+
+                return (
+                  <button
+                    className={`key ${keyStatus}`}
+                    key={keyIndex}
+                    type='button'
+                    id={keyName}
+                    onClick={() => keypressabstract(keyName.toLowerCase())}
+                  >
+                    {keyName === 'Enter' ? (
+                      <div className={'key-enter'}>Enter</div>
+                    ) : keyName === 'Backspace' ? (
+                      <div className='key-backspace'>Delete</div>
+                    ) : (
+                      <div className={`key-letter`}>{keyName}</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </>
   )
