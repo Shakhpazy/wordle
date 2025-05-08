@@ -20,6 +20,7 @@ function App() {
     [{ a: undefined }, { s: undefined }, { d: undefined }, { f: undefined }, { g: undefined }, { h: undefined }, { j: undefined }, { k: undefined }, { l: undefined }],
     [{ Enter: undefined }, { z: undefined }, { x: undefined }, { c: undefined }, { v: undefined }, { b: undefined }, { n: undefined }, { m: undefined }, { Backspace: undefined }]
   ]);
+  const [winner, setWinnter] = useState(false)
 
   useEffect(() => {
     if (guesses.length >= 6) {
@@ -28,6 +29,13 @@ function App() {
       setAttempts(0)
     }
   }, [guesses])
+
+  useEffect(() => {
+    if(winner) {
+      setGameState(false)
+      return
+    }
+  }, [winner])
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -46,9 +54,16 @@ function App() {
       setKeyboardState(defaultKeyboardState)
       setGameState(true)
       setGuesses([])
+      setWinnter(false)
+      return
     }
     else if (key === 'enter') {
       if (guess.length < 5) return
+      if (guess === word) {
+        setWinnter(true);       
+        setGameState(false);    
+        setGuess('');                          
+      }
       if (guess.length === 5) {
         setGuesses((prevGuesses) => [...prevGuesses, guess]);
         setAttempts(attempts => attempts + 1)
@@ -165,7 +180,11 @@ function App() {
       <div className="wrapper">
 
         <div>
-          {gameState ? <h1>Wordle</h1> : <h1>Press any key to Play again</h1>}
+          {gameState ? <h1 style={{marginBottom: 10}}>Wordle</h1> : <h1 style={{marginBottom: 10}}>Press any key to Play again</h1>}
+        </div>
+
+        <div>
+          {winner ? <h1 style={{marginTop: 10}}>You win</h1> :  <></> }
         </div>
 
         <RowGenerator />
